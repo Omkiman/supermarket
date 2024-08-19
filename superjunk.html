@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supermarket</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #cart {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 300px;
+            height: 50%;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+        }
+
+        #summary {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            width: 300px;
+            height: 50%;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+        }
+
+        #mydiv {
+            margin-right: 320px;
+            /* Space for cart */
+        }
+
+        .navbar {
+            margin-bottom: 20px;
+        }
+
+        .navbar-nav {
+            width: 100%;
+        }
+
+        .nav-link {
+            flex: 1;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1 class="text-center">Omri's Foods and Stuff!</h1>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="row w-100">
+                <div class="col">
+                    <button class="btn btn-primary w-100" onclick="displaycat('Vegetables')">Veggies</button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary w-100" onclick="displaycat('Fruits')">Fruits</button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary w-100" onclick="displaycat('Dairy')">Dairy</button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary w-100" onclick="displaycat('Meat')">Meat</button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary w-100" onclick="displaycat('Pantry')">Pantry</button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary w-100" onclick="displaycat('Pastry')">Pastry</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mydiv" class="container mt-4">
+        <div class="row" id="product-list"></div>
+    </div>
+
+    <div id="cart">
+        <h4>Cart</h4>
+        <div id="mycart"></div>
+    </div>
+
+    <div id="summary">
+        <h4>Summary</h4>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let itemincart = false;
+        let cart = [];
+        let groceries = [
+            {
+                "name": "Carrot",
+                "category": "Vegetables",
+                "description": "Fresh orange carrots",
+                "price": 0.99,
+                "amount": 1
+            },
+            {
+                "name": "Broccoli",
+                "category": "Vegetables",
+                "description": "Green broccoli florets",
+                "price": 1.50,
+                "amount": 1
+            },
+
+            {
+                "name": "Banana",
+                "category": "Fruits",
+                "description": "Ripe yellow bananas",
+                "price": 0.70,
+                "amount": 1
+            },
+            {
+                "name": "Orange",
+                "category": "Fruits",
+                "description": "Fresh navel oranges",
+                "price": 1.00,
+                "amount": 1
+            },
+            {
+                "name": "Cheddar Cheese",
+                "category": "Dairy",
+                "description": "Sharp cheddar cheese",
+                "price": 2.50,
+                "amount": 1
+            },
+            {
+                "name": "Butter",
+                "category": "Dairy",
+                "description": "Unsalted butter sticks",
+                "price": 2.00,
+                "amount": 1
+            },
+            {
+                "name": "Chicken Breast",
+                "category": "Meat",
+                "description": "Boneless chicken breast",
+                "price": 5.00,
+                "amount": 1
+            },
+            {
+                "name": "Ground Beef",
+                "category": "Meat",
+                "description": "Lean ground beef",
+                "price": 6.00,
+                "amount": 1
+            },
+            {
+                "name": "Pasta",
+                "category": "Pantry",
+                "description": "Whole wheat pasta",
+                "price": 1.50,
+                "amount": 1
+            },
+            {
+                "name": "Rice",
+                "category": "Pantry",
+                "description": "Basmati white rice",
+                "price": 2.00,
+                "amount": 1
+            },
+            {
+                "name": "Croissant",
+                "category": "Pastry",
+                "description": "Buttery croissants",
+                "price": 1.50,
+                "amount": 1
+            },
+            {
+                "name": "Muffin",
+                "category": "Pastry",
+                "description": "Blueberry muffins",
+                "price": 2.00,
+                "amount": 1
+            }
+        ]
+
+        function displaycat(cat) {
+            const productList = groceries
+                .filter(item => item.category === cat)
+                .map((groce, i) => `
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <img src="super/${groce.name}.jpeg" class="card-img-top" alt="${groce.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${groce.name}</h5>
+                                <p class="card-text">${groce.description}</p>
+                                <p class="card-text">Price: $${groce.price}</p>
+                                <button class="btn btn-primary" onclick="addcart('${groce.name}'); updatesummary()">Add ${groce.name} to cart</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            document.getElementById('product-list').innerHTML = productList;
+        }
+        function remove1(prodname) {
+            for (let index = 0; index < cart.length; index++) {
+                if (cart[index].name === prodname) {
+                    cart[index].amount -= 1
+                }
+                if (cart[index].amount === 0) {
+                    cart.splice(index, 1)
+                }
+            }
+            mycart.innerHTML = "<ul class='list-unstyled'>" +
+                cart.map(item => "<ul>" + `<li><div class="card w-75">
+                        <div class="card-body">
+                            <h5 class="card-title">${item.name}</h5>
+                                <p class="card-text">amount: ${item.amount}, price: ${item.price * item.amount}.</p>
+                                <button onclick="remove1('${item.name}'); updatesummary()" class="btn btn-primary">Button</button>
+                             </div>
+                                </div>
+                </ul>`
+                )
+        }
+
+        function addcart(prodname) {
+            itemincart = false;
+            for (let index = 0; index < groceries.length; index++) {
+                if (groceries[index].name === prodname) {
+                    for (let x = 0; x < cart.length; x++) {
+                        if (cart[x].name === prodname) {
+                            cart[x].amount += 1;
+                            itemincart = true;
+                            break;
+                        }
+                    }
+                    if (!itemincart) {
+                        // Create a new cart item with amount
+                        cart.push({ ...groceries[index], amount: 1 });
+                    }
+                    break;
+                }
+            }
+            mycart.innerHTML = "<ul class='list-unstyled'>" +
+                cart.map(item => "<ul>" + `<li><div class="card w-75">
+                        <div class="card-body">
+                            <h5 class="card-title">${item.name}</h5>
+                                <p class="card-text">amount: ${item.amount}, price: ${item.price * item.amount}.</p>
+                                <button onclick="remove1('${item.name}'); updatesummary()" class="btn btn-primary">Remove</button>
+                             </div>
+                                </div>
+                </ul>`
+                )
+        }
+        let total = 0
+        let cheapest = 0
+        let expensive = 0
+        let prodamount = 0
+
+        function updatesummary() {
+            let total = 0
+        let cheapest = 10000000000
+        let expensive = 0
+        let prodamount = 0
+            for (let index = 0; index < cart.length; index++) {
+                total += cart[index].price * cart[index].amount
+            }
+            for (let index = 0; index < cart.length; index++) {
+                if (cart[index].price < cheapest) {
+                    cheapest = `${cart[index].name} costs ${cart[index].price}`
+                }
+            }
+            for (let index = 0; index < cart.length; index++) {
+                if (cart[index].price > expensive) {
+                    expensive = `${cart[index].name} costs ${cart[index].price}`
+                }
+
+            }
+            for (let index = 0; index < cart.length; index++) {
+                prodamount += cart[index].amount
+
+            }
+            summary.innerHTML = `<h4>Summary</h4>
+                <ul>
+                <li>Total: $${total}</li>
+                <li>Most expensive item: ${expensive}</li>
+                <li>Cheapest item: ${cheapest}</li>
+                <li>Average cost of itmes: ${parseInt(total / prodamount)}</li>`
+        }
+    </script>
+</body>
+
+</html>
